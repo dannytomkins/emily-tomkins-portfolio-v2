@@ -18,6 +18,14 @@ const mono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['500', '700'],
 })
+export const metadata = {
+  title: {
+    default: 'Emily Tomkins — Portfolio',
+    template: '%s — Emily Tomkins',
+  },
+  description: 'Portfolio of …',
+  // optional: openGraph, twitter, icons, metadataBase, etc.
+}
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
   return (
