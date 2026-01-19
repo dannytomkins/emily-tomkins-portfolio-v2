@@ -8,6 +8,7 @@ import * as resolve from '@/sanity/plugins/resolve'
 import {pageStructure, singletonPlugin} from '@/sanity/plugins/settings'
 import page from '@/sanity/schemas/documents/page'
 import project from '@/sanity/schemas/documents/project'
+import work from '@/sanity/schemas/documents/work'
 import duration from '@/sanity/schemas/objects/duration'
 import milestone from '@/sanity/schemas/objects/milestone'
 import timeline from '@/sanity/schemas/objects/timeline'
@@ -29,18 +30,19 @@ export default defineConfig({
   title,
   schema: {
     // If you want more content types, you can add them to this array
-    types: [
-      // Singletons
-      home,
-      settings,
-      // Documents
-      duration,
-      page,
-      project,
-      // Objects
-      milestone,
-      timeline,
-    ],
+types: [
+  // Singletons
+  home,
+  settings,
+  // Documents + (note: duration is actually an object in your file structure; leave as-is if working)
+  duration,
+  page,
+  project,
+  work,
+  // Objects
+  milestone,
+  timeline,
+],
   },
   plugins: [
     structureTool({

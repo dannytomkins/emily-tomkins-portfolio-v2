@@ -69,9 +69,21 @@ export const slugsByTypeQuery = defineQuery(`
   *[_type == $type && defined(slug.current)]{"slug": slug.current}
 `)
 
-import { groq } from 'next-sanity'
 
-export const projectsByTagQuery = groq`
+export const projectBySlugAndTagQuery = defineQuery(`
+  *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{
+    ...,
+    "slug": slug.current
+  }
+`)
+
+export const slugsByTypeAndTagQuery = defineQuery(`
+  *[_type == $type && defined(slug.current) && $tag in tags[]]{
+    "slug": slug.current
+  }
+`)
+
+export const projectsByTagQuery = defineQuery(`
   *[_type == "project" && $tag in tags[]]
   | order(coalesce(duration.start, _createdAt) desc) {
     _id,
@@ -83,17 +95,5 @@ export const projectsByTagQuery = groq`
     tags,
     duration
   }
-`
+`)
 
-export const projectBySlugAndTagQuery = groq`
-  *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{
-    ...,
-    "slug": slug.current
-  }
-`
-
-export const slugsByTypeAndTagQuery = groq`
-  *[_type == $type && defined(slug.current) && $tag in tags[]]{
-    "slug": slug.current
-  }
-`
