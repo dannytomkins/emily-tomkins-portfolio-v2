@@ -52,6 +52,51 @@ export type Milestone = {
   duration?: Duration
 }
 
+export type Work = {
+  _id: string
+  _type: 'work'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  section?: 'portfolio' | 'studentWork'
+  title?: string
+  coverImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  images?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+    _key: string
+  }>
+  overview?: string
+  year?: number
+  externalLink?: string
+  tags?: Array<string>
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x?: number
+  y?: number
+  height?: number
+  width?: number
+}
+
 export type Project = {
   _id: string
   _type: 'project'
@@ -118,22 +163,6 @@ export type Project = {
         _key: string
       }
   >
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x?: number
-  y?: number
-  height?: number
-  width?: number
 }
 
 export type Duration = {
@@ -392,9 +421,10 @@ export type AllSanitySchemaTypes =
   | Timeline
   | SanityImageAssetReference
   | Milestone
-  | Project
+  | Work
   | SanityImageCrop
   | SanityImageHotspot
+  | Project
   | Duration
   | Slug
   | Page
@@ -655,6 +685,117 @@ export type SlugsByTypeQueryResult = Array<{
   slug: string | null
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: projectBySlugAndTagQuery
+// Query: *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{    ...,    "slug": slug.current  }
+export type ProjectBySlugAndTagQueryResult = {
+  _id: string
+  _type: 'project'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title?: string
+  slug: string | null
+  overview?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: never
+    markDefs?: null
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  coverImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  duration?: Duration
+  client?: string
+  site?: string
+  tags?: Array<string>
+  description?: Array<
+    | ({
+        _key: string
+      } & Timeline)
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          href?: string
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        caption?: string
+        alt?: string
+        _type: 'image'
+        _key: string
+      }
+  >
+} | null
+
+// Source: sanity/lib/queries.ts
+// Variable: slugsByTypeAndTagQuery
+// Query: *[_type == $type && defined(slug.current) && $tag in tags[]]{    "slug": slug.current  }
+export type SlugsByTypeAndTagQueryResult = Array<{
+  slug: string | null
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: projectsByTagQuery
+// Query: *[_type == "project" && $tag in tags[]]  | order(coalesce(duration.start, _createdAt) desc) {    _id,    _type,    title,    "slug": slug.current,    overview,    coverImage,    tags,    duration  }
+export type ProjectsByTagQueryResult = Array<{
+  _id: string
+  _type: 'project'
+  title: string | null
+  slug: string | null
+  overview: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: never
+    markDefs?: null
+    level?: number
+    _type: 'block'
+    _key: string
+  }> | null
+  coverImage: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  } | null
+  tags: Array<string> | null
+  duration: Duration | null
+}>
+
 declare module '@sanity/client' {
   interface SanityQueries {
     '\n  *[_type == "home"][0]{\n    _id,\n    _type,\n    overview,\n    showcaseProjects[]{\n      _key,\n      ...@->{\n        _id,\n        _type,\n        coverImage,\n        overview,\n        "slug": slug.current,\n        tags,\n        title,\n      }\n    },\n    title,\n  }\n': HomePageQueryResult
@@ -662,5 +803,8 @@ declare module '@sanity/client' {
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    _type,\n    client,\n    coverImage,\n    description,\n    duration,\n    overview,\n    site,\n    "slug": slug.current,\n    tags,\n    title,\n  }\n': ProjectBySlugQueryResult
     '\n  *[_type == "settings"][0]{\n    _id,\n    _type,\n    footer,\n    menuItems[]{\n      _key,\n      ...@->{\n        _type,\n        "slug": slug.current,\n        title\n      }\n    },\n    ogImage,\n  }\n': SettingsQueryResult
     '\n  *[_type == $type && defined(slug.current)]{"slug": slug.current}\n': SlugsByTypeQueryResult
+    '\n  *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{\n    ...,\n    "slug": slug.current\n  }\n': ProjectBySlugAndTagQueryResult
+    '\n  *[_type == $type && defined(slug.current) && $tag in tags[]]{\n    "slug": slug.current\n  }\n': SlugsByTypeAndTagQueryResult
+    '\n  *[_type == "project" && $tag in tags[]]\n  | order(coalesce(duration.start, _createdAt) desc) {\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    overview,\n    coverImage,\n    tags,\n    duration\n  }\n': ProjectsByTagQueryResult
   }
 }
