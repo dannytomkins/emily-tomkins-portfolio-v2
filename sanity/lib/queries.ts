@@ -69,31 +69,28 @@ export const slugsByTypeQuery = defineQuery(`
   *[_type == $type && defined(slug.current)]{"slug": slug.current}
 `)
 
-
-export const projectBySlugAndTagQuery = defineQuery(`
-  *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{
-    ...,
-    "slug": slug.current
-  }
-`)
-
-export const slugsByTypeAndTagQuery = defineQuery(`
-  *[_type == $type && defined(slug.current) && $tag in tags[]]{
-    "slug": slug.current
-  }
-`)
-
-export const projectsByTagQuery = defineQuery(`
-  *[_type == "project" && $tag in tags[]]
-  | order(coalesce(duration.start, _createdAt) desc) {
+export const WORK_GALLERY_QUERY = `
+  *[_type == "work" && section == $section]
+  | order(coalesce(year, _createdAt) desc) {
     _id,
-    _type,
     title,
-    "slug": slug.current,
-    overview,
+    section,
     coverImage,
-    tags,
-    duration
+    images,
+    overview
+  }
+`
+
+export const worksBySectionQuery = defineQuery(`
+  *[_type == "work" && section == $section]
+  | order(coalesce(year, _createdAt) desc) {
+    _id,
+    title,
+    section,
+    coverImage,
+    images,
+    overview,
+    year,
+    tags
   }
 `)
-
