@@ -686,105 +686,12 @@ export type SlugsByTypeQueryResult = Array<{
 }>
 
 // Source: sanity/lib/queries.ts
-// Variable: projectBySlugAndTagQuery
-// Query: *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{    ...,    "slug": slug.current  }
-export type ProjectBySlugAndTagQueryResult = {
+// Variable: worksBySectionQuery
+// Query: *[_type == "work" && section == $section]  | order(coalesce(year, _createdAt) desc) {    _id,    title,    section,    coverImage,    images,    overview,    year,    tags  }
+export type WorksBySectionQueryResult = Array<{
   _id: string
-  _type: 'project'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title?: string
-  slug: string | null
-  overview?: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  coverImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    _type: 'image'
-  }
-  duration?: Duration
-  client?: string
-  site?: string
-  tags?: Array<string>
-  description?: Array<
-    | ({
-        _key: string
-      } & Timeline)
-    | {
-        children?: Array<{
-          marks?: Array<string>
-          text?: string
-          _type: 'span'
-          _key: string
-        }>
-        style?: 'normal'
-        listItem?: 'bullet' | 'number'
-        markDefs?: Array<{
-          href?: string
-          _type: 'link'
-          _key: string
-        }>
-        level?: number
-        _type: 'block'
-        _key: string
-      }
-    | {
-        asset?: SanityImageAssetReference
-        media?: unknown
-        hotspot?: SanityImageHotspot
-        crop?: SanityImageCrop
-        caption?: string
-        alt?: string
-        _type: 'image'
-        _key: string
-      }
-  >
-} | null
-
-// Source: sanity/lib/queries.ts
-// Variable: slugsByTypeAndTagQuery
-// Query: *[_type == $type && defined(slug.current) && $tag in tags[]]{    "slug": slug.current  }
-export type SlugsByTypeAndTagQueryResult = Array<{
-  slug: string | null
-}>
-
-// Source: sanity/lib/queries.ts
-// Variable: projectsByTagQuery
-// Query: *[_type == "project" && $tag in tags[]]  | order(coalesce(duration.start, _createdAt) desc) {    _id,    _type,    title,    "slug": slug.current,    overview,    coverImage,    tags,    duration  }
-export type ProjectsByTagQueryResult = Array<{
-  _id: string
-  _type: 'project'
   title: string | null
-  slug: string | null
-  overview: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }> | null
+  section: 'portfolio' | 'studentWork' | null
   coverImage: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -792,8 +699,17 @@ export type ProjectsByTagQueryResult = Array<{
     crop?: SanityImageCrop
     _type: 'image'
   } | null
+  images: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+    _key: string
+  }> | null
+  overview: string | null
+  year: number | null
   tags: Array<string> | null
-  duration: Duration | null
 }>
 
 declare module '@sanity/client' {
@@ -803,8 +719,6 @@ declare module '@sanity/client' {
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    _type,\n    client,\n    coverImage,\n    description,\n    duration,\n    overview,\n    site,\n    "slug": slug.current,\n    tags,\n    title,\n  }\n': ProjectBySlugQueryResult
     '\n  *[_type == "settings"][0]{\n    _id,\n    _type,\n    footer,\n    menuItems[]{\n      _key,\n      ...@->{\n        _type,\n        "slug": slug.current,\n        title\n      }\n    },\n    ogImage,\n  }\n': SettingsQueryResult
     '\n  *[_type == $type && defined(slug.current)]{"slug": slug.current}\n': SlugsByTypeQueryResult
-    '\n  *[_type == "project" && slug.current == $slug && $tag in tags[]][0]{\n    ...,\n    "slug": slug.current\n  }\n': ProjectBySlugAndTagQueryResult
-    '\n  *[_type == $type && defined(slug.current) && $tag in tags[]]{\n    "slug": slug.current\n  }\n': SlugsByTypeAndTagQueryResult
-    '\n  *[_type == "project" && $tag in tags[]]\n  | order(coalesce(duration.start, _createdAt) desc) {\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    overview,\n    coverImage,\n    tags,\n    duration\n  }\n': ProjectsByTagQueryResult
+    '\n  *[_type == "work" && section == $section]\n  | order(coalesce(year, _createdAt) desc) {\n    _id,\n    title,\n    section,\n    coverImage,\n    images,\n    overview,\n    year,\n    tags\n  }\n': WorksBySectionQueryResult
   }
 }
