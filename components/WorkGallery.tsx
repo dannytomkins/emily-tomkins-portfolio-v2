@@ -51,25 +51,40 @@ export function WorkGallery({works}: {works: Work[]}) {
   }
 
   // Keyboard + scroll lock
-  useEffect(() => {
-    if (!isOpen) return
+useEffect(() => {
+  if (!isOpen) return
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'ArrowLeft') prev()
-    }
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') close()
+    if (e.key === 'ArrowRight') next()
+    if (e.key === 'ArrowLeft') prev()
+  }
 
-    document.addEventListener('keydown', onKeyDown)
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+  document.addEventListener('keydown', onKeyDown)
 
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = originalOverflow
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, activeImages.length])
+  // --- Scroll lock (body + html) ---
+  const originalBodyOverflow = document.body.style.overflow
+  const originalHtmlOverflow = document.documentElement.style.overflow
+
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
+
+  // Prevent iOS "rubber band" / touch scroll behind modal
+  const preventTouchMove = (e: TouchEvent) => {
+    e.preventDefault()
+  }
+  document.addEventListener('touchmove', preventTouchMove, { passive: false })
+
+  return () => {
+    document.removeEventListener('keydown', onKeyDown)
+    document.removeEventListener('touchmove', preventTouchMove)
+
+    document.body.style.overflow = originalBodyOverflow
+    document.documentElement.style.overflow = originalHtmlOverflow
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isOpen, activeImages.length])
+
 
   return (
     <>
