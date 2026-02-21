@@ -53,15 +53,20 @@ export const settingsQuery = defineQuery(`
     _id,
     _type,
     footer,
+    ogImage,
     menuItems[]{
       _key,
-      ...@->{
+      title,
+      kind,
+      route,
+      href,
+      openInNewTab,
+      reference->{
         _type,
-        "slug": slug.current,
-        title
+        title,
+        "slug": slug.current
       }
-    },
-    ogImage,
+    }
   }
 `)
 
