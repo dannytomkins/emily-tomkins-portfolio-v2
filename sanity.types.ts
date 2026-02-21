@@ -52,6 +52,99 @@ export type Milestone = {
   duration?: Duration
 }
 
+export type Duration = {
+  _type: 'duration'
+  start?: string
+  end?: string
+}
+
+export type HomeReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'home'
+}
+
+export type PageReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'page'
+}
+
+export type ProjectReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'project'
+}
+
+export type WorkReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'work'
+}
+
+export type Settings = {
+  _id: string
+  _type: 'settings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  menuItems?: Array<{
+    title?: string
+    kind?: 'route' | 'reference' | 'external'
+    route?: string
+    reference?: HomeReference | PageReference | ProjectReference | WorkReference
+    href?: string
+    openInNewTab?: boolean
+    _type: 'menuItem'
+    _key: string
+  }>
+  footer?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href?: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  ogImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x?: number
+  y?: number
+  height?: number
+  width?: number
+}
+
 export type Work = {
   _id: string
   _type: 'work'
@@ -79,22 +172,6 @@ export type Work = {
   year?: number
   externalLink?: string
   tags?: Array<string>
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top?: number
-  bottom?: number
-  left?: number
-  right?: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x?: number
-  y?: number
-  height?: number
-  width?: number
 }
 
 export type Project = {
@@ -165,12 +242,6 @@ export type Project = {
   >
 }
 
-export type Duration = {
-  _type: 'duration'
-  start?: string
-  end?: string
-}
-
 export type Slug = {
   _type: 'slug'
   current?: string
@@ -232,61 +303,6 @@ export type Page = {
         _key: string
       }
   >
-}
-
-export type HomeReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'home'
-}
-
-export type PageReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'page'
-}
-
-export type ProjectReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'project'
-}
-
-export type Settings = {
-  _id: string
-  _type: 'settings'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  menuItems?: Array<HomeReference | PageReference | ProjectReference>
-  footer?: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
-    listItem?: 'bullet' | 'number'
-    markDefs?: Array<{
-      href?: string
-      _type: 'link'
-      _key: string
-    }>
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  ogImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    _type: 'image'
-  }
 }
 
 export type Home = {
@@ -421,17 +437,18 @@ export type AllSanitySchemaTypes =
   | Timeline
   | SanityImageAssetReference
   | Milestone
-  | Work
-  | SanityImageCrop
-  | SanityImageHotspot
-  | Project
   | Duration
-  | Slug
-  | Page
   | HomeReference
   | PageReference
   | ProjectReference
+  | WorkReference
   | Settings
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Work
+  | Project
+  | Slug
+  | Page
   | Home
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -627,7 +644,7 @@ export type ProjectBySlugQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: settingsQuery
-// Query: *[_type == "settings"][0]{    _id,    _type,    footer,    menuItems[]{      _key,      ...@->{        _type,        "slug": slug.current,        title      }    },    ogImage,  }
+// Query: *[_type == "settings"][0]{    _id,    _type,    footer,    ogImage,    menuItems[]{      _key,      title,      kind,      route,      href,      openInNewTab,      reference->{        _type,        title,        "slug": slug.current      }    }  }
 export type SettingsQueryResult = {
   _id: string
   _type: 'settings'
@@ -649,26 +666,6 @@ export type SettingsQueryResult = {
     _type: 'block'
     _key: string
   }> | null
-  menuItems: Array<
-    | {
-        _key: null
-        _type: 'home'
-        slug: null
-        title: string | null
-      }
-    | {
-        _key: null
-        _type: 'page'
-        slug: string | null
-        title: string | null
-      }
-    | {
-        _key: null
-        _type: 'project'
-        slug: string | null
-        title: string | null
-      }
-  > | null
   ogImage: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -676,6 +673,36 @@ export type SettingsQueryResult = {
     crop?: SanityImageCrop
     _type: 'image'
   } | null
+  menuItems: Array<{
+    _key: string
+    title: string | null
+    kind: 'external' | 'reference' | 'route' | null
+    route: string | null
+    href: string | null
+    openInNewTab: boolean | null
+    reference:
+      | {
+          _type: 'home'
+          title: string | null
+          slug: null
+        }
+      | {
+          _type: 'page'
+          title: string | null
+          slug: string | null
+        }
+      | {
+          _type: 'project'
+          title: string | null
+          slug: string | null
+        }
+      | {
+          _type: 'work'
+          title: string | null
+          slug: null
+        }
+      | null
+  }> | null
 } | null
 
 // Source: sanity/lib/queries.ts
@@ -717,7 +744,7 @@ declare module '@sanity/client' {
     '\n  *[_type == "home"][0]{\n    _id,\n    _type,\n    overview,\n    showcaseProjects[]{\n      _key,\n      ...@->{\n        _id,\n        _type,\n        coverImage,\n        overview,\n        "slug": slug.current,\n        tags,\n        title,\n      }\n    },\n    title,\n  }\n': HomePageQueryResult
     '\n  *[_type == "page" && slug.current == $slug][0] {\n    _id,\n    _type,\n    body,\n    overview,\n    title,\n    "slug": slug.current,\n  }\n': PagesBySlugQueryResult
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    _type,\n    client,\n    coverImage,\n    description,\n    duration,\n    overview,\n    site,\n    "slug": slug.current,\n    tags,\n    title,\n  }\n': ProjectBySlugQueryResult
-    '\n  *[_type == "settings"][0]{\n    _id,\n    _type,\n    footer,\n    menuItems[]{\n      _key,\n      ...@->{\n        _type,\n        "slug": slug.current,\n        title\n      }\n    },\n    ogImage,\n  }\n': SettingsQueryResult
+    '\n  *[_type == "settings"][0]{\n    _id,\n    _type,\n    footer,\n    ogImage,\n    menuItems[]{\n      _key,\n      title,\n      kind,\n      route,\n      href,\n      openInNewTab,\n      reference->{\n        _type,\n        title,\n        "slug": slug.current\n      }\n    }\n  }\n': SettingsQueryResult
     '\n  *[_type == $type && defined(slug.current)]{"slug": slug.current}\n': SlugsByTypeQueryResult
     '\n  *[_type == "work" && section == $section]\n  | order(coalesce(year, _createdAt) desc) {\n    _id,\n    title,\n    section,\n    coverImage,\n    images,\n    overview,\n    year,\n    tags\n  }\n': WorksBySectionQueryResult
   }
