@@ -51,40 +51,39 @@ export function WorkGallery({works}: {works: Work[]}) {
   }
 
   // Keyboard + scroll lock
-useEffect(() => {
-  if (!isOpen) return
+  useEffect(() => {
+    if (!isOpen) return
 
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') close()
-    if (e.key === 'ArrowRight') next()
-    if (e.key === 'ArrowLeft') prev()
-  }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+      if (e.key === 'ArrowRight') next()
+      if (e.key === 'ArrowLeft') prev()
+    }
 
-  document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keydown', onKeyDown)
 
-  // --- Scroll lock (body + html) ---
-  const originalBodyOverflow = document.body.style.overflow
-  const originalHtmlOverflow = document.documentElement.style.overflow
+    // --- Scroll lock (body + html) ---
+    const originalBodyOverflow = document.body.style.overflow
+    const originalHtmlOverflow = document.documentElement.style.overflow
 
-  document.body.style.overflow = 'hidden'
-  document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
 
-  // Prevent iOS "rubber band" / touch scroll behind modal
-  const preventTouchMove = (e: TouchEvent) => {
-    e.preventDefault()
-  }
-  document.addEventListener('touchmove', preventTouchMove, { passive: false })
+    // Prevent iOS "rubber band" / touch scroll behind modal
+    const preventTouchMove = (e: TouchEvent) => {
+      e.preventDefault()
+    }
+    document.addEventListener('touchmove', preventTouchMove, {passive: false})
 
-  return () => {
-    document.removeEventListener('keydown', onKeyDown)
-    document.removeEventListener('touchmove', preventTouchMove)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('touchmove', preventTouchMove)
 
-    document.body.style.overflow = originalBodyOverflow
-    document.documentElement.style.overflow = originalHtmlOverflow
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [isOpen, activeImages.length])
-
+      document.body.style.overflow = originalBodyOverflow
+      document.documentElement.style.overflow = originalHtmlOverflow
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, activeImages.length])
 
   return (
     <>
@@ -128,12 +127,8 @@ useEffect(() => {
             </button>
 
             {/* Image */}
-            <div className="overflow-hidden rounded-md bg-black">
-              <ImageBox
-                image={activeImages[openImageIndex]}
-                alt=""
-                classesWrapper="relative aspect-[16/9]"
-              />
+            <div className="rounded-md bg-black p-2">
+              <ImageBox image={activeImages[openImageIndex]} alt="" fit="contain" mode="natural" />
             </div>
 
             {/* Controls */}
