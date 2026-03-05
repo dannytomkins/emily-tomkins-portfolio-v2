@@ -127,8 +127,17 @@ export function WorkGallery({works}: {works: Work[]}) {
             </button>
 
             {/* Image */}
-            <div className="rounded-md bg-black p-2">
-              <ImageBox image={activeImages[openImageIndex]} alt="" fit="contain" mode="natural" />
+            <div className="relative w-full max-w-5xl rounded-md bg-black">
+              <div className="relative h-[80vh] w-full">
+                <ImageBox
+                  image={activeImages[openImageIndex]}
+                  alt=""
+                  fit="contain"
+                  mode="fillBox"
+                  classesWrapper="h-full w-full"
+                  size="(max-width: 1024px) 100vw, 1024px"
+                />
+              </div>
             </div>
 
             {/* Controls */}
