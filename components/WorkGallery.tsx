@@ -25,7 +25,6 @@ export function WorkGallery({works}: {works: Work[]}) {
 
   const activeImages = useMemo(() => {
     if (!activeWork) return []
-    // Prefer `images[]` for the lightbox; fall back to coverImage if images is empty.
     const imgs = (activeWork.images ?? []).filter(Boolean)
     return imgs.length > 0 ? imgs : activeWork.coverImage ? [activeWork.coverImage] : []
   }, [activeWork])
@@ -41,12 +40,12 @@ export function WorkGallery({works}: {works: Work[]}) {
   }
 
   function next() {
-    if (!activeImages.length) return
+    if (activeImages.length <= 1) return
     setOpenImageIndex((i) => (i + 1) % activeImages.length)
   }
 
   function prev() {
-    if (!activeImages.length) return
+    if (activeImages.length <= 1) return
     setOpenImageIndex((i) => (i - 1 + activeImages.length) % activeImages.length)
   }
 
@@ -62,14 +61,12 @@ export function WorkGallery({works}: {works: Work[]}) {
 
     document.addEventListener('keydown', onKeyDown)
 
-    // --- Scroll lock (body + html) ---
     const originalBodyOverflow = document.body.style.overflow
     const originalHtmlOverflow = document.documentElement.style.overflow
 
     document.body.style.overflow = 'hidden'
     document.documentElement.style.overflow = 'hidden'
 
-    // Prevent iOS "rubber band" / touch scroll behind modal
     const preventTouchMove = (e: TouchEvent) => {
       e.preventDefault()
     }
@@ -94,9 +91,15 @@ export function WorkGallery({works}: {works: Work[]}) {
             key={work._id}
             type="button"
             onClick={() => open(idx, 0)}
-            className="overflow-hidden rounded-md border text-left hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-black/20"
+            className="cursor-pointer overflow-hidden rounded-md border bg-white text-left transition hover:-translate-y-[1px] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-black/20"
           >
-            <ImageBox image={work.coverImage} alt="" classesWrapper="relative aspect-[16/9]" />
+            <ImageBox
+              image={work.coverImage}
+              alt={work.title ?? ''}
+              fit="contain"
+              mode="fillBox"
+              classesWrapper="aspect-[16/9] bg-gray-50"
+            />
             <div className="p-4">
               <div className="text-lg font-medium">{work.title ?? 'Untitled'}</div>
               {work.year ? <div className="text-sm opacity-70">{work.year}</div> : null}
@@ -110,9 +113,8 @@ export function WorkGallery({works}: {works: Work[]}) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
           onMouseDown={(e) => {
-            // Click outside to close (only if clicking the backdrop)
             if (e.target === e.currentTarget) close()
           }}
         >
@@ -121,27 +123,65 @@ export function WorkGallery({works}: {works: Work[]}) {
             <button
               type="button"
               onClick={close}
-              className="absolute right-2 top-2 z-10 rounded-md bg-black/60 px-3 py-2 text-sm text-white hover:bg-black/80"
+              aria-label="Close lightbox"
+              className="absolute right-2 top-2 z-10 rounded-md bg-black/60 px-3 py-2 text-sm text-white transition hover:bg-black/80"
             >
               Close
             </button>
 
-            {/* Image */}
-            <div className="relative w-full max-w-5xl rounded-md bg-black">
+            {/* Main image frame */}
+            <div className="relative w-full rounded-md bg-black">
               <div className="relative h-[80vh] w-full">
-                <ImageBox
-                  image={activeImages[openImageIndex]}
-                  alt=""
-                  fit="contain"
-                  mode="fillBox"
-                  classesWrapper="h-full w-full"
-                  size="(max-width: 1024px) 100vw, 1024px"
-                />
+                <button
+                  type="button"
+                  onClick={next}
+                  className="block h-full w-full cursor-default"
+                  aria-label={
+                    activeImages.length > 1 ? 'Advance to next image' : 'Image preview'
+                  }
+                >
+                  <ImageBox
+                    image={activeImages[openImageIndex]}
+                    alt={activeWork.title ?? ''}
+                    fit="contain"
+                    mode="fillBox"
+                    classesWrapper="h-full w-full"
+                    size="(max-width: 1024px) 100vw, 1024px"
+                  />
+                </button>
               </div>
             </div>
 
-            {/* Controls */}
-            <div className="mt-3 flex items-center justify-between gap-3 text-white">
+            {/* Thumbnails */}
+            {activeImages.length > 1 ? (
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {activeImages.map((image, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setOpenImageIndex(idx)}
+                    aria-label={`View image ${idx + 1}`}
+                    className={`relative h-16 w-16 overflow-hidden rounded border transition ${
+                      idx === openImageIndex
+                        ? 'border-white ring-2 ring-white'
+                        : 'border-white/30 hover:border-white/60'
+                    }`}
+                  >
+                    <ImageBox
+                      image={image}
+                      alt=""
+                      fit="contain"
+                      mode="fillBox"
+                      classesWrapper="h-full w-full bg-black"
+                      size="64px"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {/* Controls / caption */}
+            <div className="mt-3 flex min-h-[3.5rem] items-center justify-between gap-3 text-white">
               <div className="min-w-0">
                 <div className="truncate text-base font-medium">
                   {activeWork.title ?? 'Untitled'}
@@ -154,28 +194,36 @@ export function WorkGallery({works}: {works: Work[]}) {
                 ) : null}
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={prev}
-                  className="rounded-md bg-white/10 px-3 py-2 text-sm hover:bg-white/20"
-                >
-                  ←
-                </button>
-                <div className="text-sm text-white/80">
-                  {activeImages.length ? openImageIndex + 1 : 0}/{activeImages.length}
+              {activeImages.length > 1 ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={prev}
+                    aria-label="Previous image"
+                    className="rounded-md bg-white/10 px-3 py-2 text-sm transition hover:bg-white/20"
+                  >
+                    ←
+                  </button>
+                  <div className="text-sm text-white/80">
+                    {openImageIndex + 1}/{activeImages.length}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={next}
+                    aria-label="Next image"
+                    className="rounded-md bg-white/10 px-3 py-2 text-sm transition hover:bg-white/20"
+                  >
+                    →
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={next}
-                  className="rounded-md bg-white/10 px-3 py-2 text-sm hover:bg-white/20"
-                >
-                  →
-                </button>
-              </div>
+              ) : null}
             </div>
 
-            <div className="mt-2 text-xs text-white/60">Tip: use ← → keys, Esc to close</div>
+            <div className="mt-2 text-xs text-white/60">
+              {activeImages.length > 1
+                ? 'Tip: click the image or use ← → keys, Esc to close'
+                : 'Tip: press Esc to close'}
+            </div>
           </div>
         </div>
       ) : null}
