@@ -1,7 +1,7 @@
 import '@/styles/index.css'
 import {CustomPortableText} from '@/components/CustomPortableText'
 import {Navbar} from '@/components/Navbar'
-import IntroTemplate from '@/intro-template'
+// import IntroTemplate from '@/intro-template'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
 import {homePageQuery, settingsQuery} from '@/sanity/lib/queries'
 import {urlForOpenGraphImage} from '@/sanity/lib/utils'
