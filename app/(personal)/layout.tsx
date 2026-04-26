@@ -61,9 +61,9 @@ export default async function IndexRoute({children}: {children: React.ReactNode}
             />
           )}
         </footer>
-        <Suspense>
+        {/* <Suspense>
           <IntroTemplate />
-        </Suspense>
+        </Suspense> */}
       </div>
       <Toaster />
       <SanityLive onError={handleError} />
