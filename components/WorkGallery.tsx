@@ -2,6 +2,7 @@
 
 import ImageBox from '@/components/ImageBox'
 import {useEffect, useMemo, useState} from 'react'
+import {createPortal} from 'react-dom'
 
 type Work = {
   _id: string
@@ -13,8 +14,13 @@ type Work = {
 }
 
 export function WorkGallery({works}: {works: Work[]}) {
+  const [mounted, setMounted] = useState(false)
   const [openWorkIndex, setOpenWorkIndex] = useState<number | null>(null)
   const [openImageIndex, setOpenImageIndex] = useState<number>(0)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const isOpen = openWorkIndex !== null
 
@@ -49,7 +55,6 @@ export function WorkGallery({works}: {works: Work[]}) {
     setOpenImageIndex((i) => (i - 1 + activeImages.length) % activeImages.length)
   }
 
-  // Keyboard + scroll lock
   useEffect(() => {
     if (!isOpen) return
 
@@ -82,9 +87,131 @@ export function WorkGallery({works}: {works: Work[]}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, activeImages.length])
 
+  const lightbox =
+    mounted && isOpen && activeWork
+      ? createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 p-4"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) close()
+            }}
+          >
+            <div className="relative w-full max-w-5xl">
+              <button
+                type="button"
+                onClick={close}
+                aria-label="Close lightbox"
+                className="absolute right-2 top-2 z-10 rounded-md bg-black/60 px-3 py-2 text-sm text-white transition hover:bg-black/80"
+              >
+                Close
+              </button>
+
+              <div className="relative w-full rounded-md bg-black">
+                <div className="relative h-[80vh] w-full">
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="block h-full w-full cursor-default"
+                    aria-label={
+                      activeImages.length > 1 ? 'Advance to next image' : 'Image preview'
+                    }
+                  >
+                    <ImageBox
+                      image={activeImages[openImageIndex]}
+                      alt={activeWork.title ?? ''}
+                      fit="contain"
+                      mode="fillBox"
+                      classesWrapper="h-full w-full"
+                      size="(max-width: 1024px) 100vw, 1024px"
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {activeImages.length > 1 ? (
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={prev}
+                    aria-label="Previous image"
+                    className="flex h-10 w-10 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-white/20"
+                  >
+                    ←
+                  </button>
+
+                  <div className="flex max-w-full gap-2 overflow-x-auto px-1">
+                    {activeImages.map((image, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setOpenImageIndex(idx)}
+                        aria-label={`View image ${idx + 1}`}
+                        className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded border transition ${
+                          idx === openImageIndex
+                            ? 'border-white ring-2 ring-white'
+                            : 'border-white/30 hover:border-white/60'
+                        }`}
+                      >
+                        <ImageBox
+                          image={image}
+                          alt=""
+                          fit="contain"
+                          mode="fillBox"
+                          classesWrapper="h-full w-full bg-black"
+                          size="64px"
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={next}
+                    aria-label="Next image"
+                    className="flex h-10 w-10 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-white/20"
+                  >
+                    →
+                  </button>
+                </div>
+              ) : null}
+
+              <div className="mt-3 flex min-h-[3.5rem] items-center justify-between gap-3 text-white">
+                <div className="min-w-0">
+                  <div className="truncate text-base font-medium">
+                    {activeWork.title ?? 'Untitled'}
+                  </div>
+
+                  {activeWork.overview ? (
+                    <div className="mt-1 line-clamp-2 text-sm text-white/80">
+                      {activeWork.overview}
+                    </div>
+                  ) : null}
+                </div>
+
+                {activeImages.length > 1 ? (
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-white/80">
+                      {openImageIndex + 1}/{activeImages.length}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="mt-2 text-xs text-white/60">
+                {activeImages.length > 1
+                  ? 'Tip: click the image or use ← → keys, Esc to close'
+                  : 'Tip: press Esc to close'}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
     <>
-      {/* Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {works?.map((work, idx) => (
           <button
@@ -108,125 +235,7 @@ export function WorkGallery({works}: {works: Work[]}) {
         ))}
       </div>
 
-      {/* Lightbox */}
-      {isOpen && activeWork ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) close()
-          }}
-        >
-          <div className="relative w-full max-w-5xl">
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close lightbox"
-              className="absolute right-2 top-2 z-10 rounded-md bg-black/60 px-3 py-2 text-sm text-white transition hover:bg-black/80"
-            >
-              Close
-            </button>
-
-            {/* Main image frame */}
-            <div className="relative w-full rounded-md bg-black">
-              <div className="relative h-[80vh] w-full">
-                <button
-                  type="button"
-                  onClick={next}
-                  className="block h-full w-full cursor-default"
-                  aria-label={
-                    activeImages.length > 1 ? 'Advance to next image' : 'Image preview'
-                  }
-                >
-                  <ImageBox
-                    image={activeImages[openImageIndex]}
-                    alt={activeWork.title ?? ''}
-                    fit="contain"
-                    mode="fillBox"
-                    classesWrapper="h-full w-full"
-                    size="(max-width: 1024px) 100vw, 1024px"
-                  />
-                </button>
-              </div>
-            </div>
-
-            {/* Thumbnails */}
-            {activeImages.length > 1 ? (
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {activeImages.map((image, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setOpenImageIndex(idx)}
-                    aria-label={`View image ${idx + 1}`}
-                    className={`relative h-16 w-16 overflow-hidden rounded border transition ${
-                      idx === openImageIndex
-                        ? 'border-white ring-2 ring-white'
-                        : 'border-white/30 hover:border-white/60'
-                    }`}
-                  >
-                    <ImageBox
-                      image={image}
-                      alt=""
-                      fit="contain"
-                      mode="fillBox"
-                      classesWrapper="h-full w-full bg-black"
-                      size="64px"
-                    />
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {/* Controls / caption */}
-            <div className="mt-3 flex min-h-[3.5rem] items-center justify-between gap-3 text-white">
-              <div className="min-w-0">
-                <div className="truncate text-base font-medium">
-                  {activeWork.title ?? 'Untitled'}
-                </div>
-
-                {activeWork.overview ? (
-                  <div className="mt-1 line-clamp-2 text-sm text-white/80">
-                    {activeWork.overview}
-                  </div>
-                ) : null}
-              </div>
-
-              {activeImages.length > 1 ? (
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={prev}
-                    aria-label="Previous image"
-                    className="rounded-md bg-white/10 px-3 py-2 text-sm transition hover:bg-white/20"
-                  >
-                    ←
-                  </button>
-                  <div className="text-sm text-white/80">
-                    {openImageIndex + 1}/{activeImages.length}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={next}
-                    aria-label="Next image"
-                    className="rounded-md bg-white/10 px-3 py-2 text-sm transition hover:bg-white/20"
-                  >
-                    →
-                  </button>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="mt-2 text-xs text-white/60">
-              {activeImages.length > 1
-                ? 'Tip: click the image or use ← → keys, Esc to close'
-                : 'Tip: press Esc to close'}
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {lightbox}
     </>
   )
 }
