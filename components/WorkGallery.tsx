@@ -210,32 +210,30 @@ export function WorkGallery({works}: {works: Work[]}) {
         )
       : null
 
-  return (
-    <>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {works?.map((work, idx) => (
-          <button
-            key={work._id}
-            type="button"
-            onClick={() => open(idx, 0)}
-            className="cursor-pointer overflow-hidden rounded-md border bg-white text-left transition hover:-translate-y-[1px] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-black/20"
-          >
+return (
+  <>
+    <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
+      {works?.map((work, idx) => (
+        <button
+          key={work._id}
+          type="button"
+          onClick={() => open(idx, 0)}
+          aria-label={`Open ${work.title ?? 'work'} gallery`}
+          className="group mb-6 block w-full break-inside-avoid cursor-pointer bg-transparent text-left transition hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-black/20"
+        >
+          <div className="transition group-hover:scale-[1.01]">
             <ImageBox
               image={work.coverImage}
               alt={work.title ?? ''}
               fit="contain"
-              mode="fillBox"
-              classesWrapper="aspect-[16/9] bg-gray-50"
+              mode="natural"
             />
-            <div className="p-4">
-              <div className="text-lg font-medium">{work.title ?? 'Untitled'}</div>
-              {work.year ? <div className="text-sm opacity-70">{work.year}</div> : null}
-            </div>
-          </button>
-        ))}
-      </div>
+          </div>
+        </button>
+      ))}
+    </div>
 
-      {lightbox}
-    </>
-  )
+    {lightbox}
+  </>
+)
 }
