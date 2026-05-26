@@ -118,14 +118,15 @@ export function WorkGallery({works}: {works: Work[]}) {
                       activeImages.length > 1 ? 'Advance to next image' : 'Image preview'
                     }
                   >
-                    <ImageBox
-                      image={activeImages[openImageIndex]}
-                      alt={activeWork.title ?? ''}
-                      fit="contain"
-                      mode="fillBox"
-                      classesWrapper="h-full w-full"
-                      size="(max-width: 1024px) 100vw, 1024px"
-                    />
+<ImageBox
+  image={activeImages[openImageIndex]}
+  alt={activeWork.title ?? ''}
+  fit="contain"
+  mode="fillBox"
+  backgroundClassName="bg-black"
+  classesWrapper="h-full w-full"
+  size="(max-width: 1024px) 100vw, 1024px"
+/>
                   </button>
                 </div>
               </div>

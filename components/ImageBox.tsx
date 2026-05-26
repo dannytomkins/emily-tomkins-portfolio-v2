@@ -10,6 +10,7 @@ interface ImageBoxProps {
   'data-sanity'?: string
   fit?: 'cover' | 'contain'
   mode?: 'fillBox' | 'natural'
+  backgroundClassName?: string
 }
 
 export default function ImageBox({
@@ -19,6 +20,7 @@ export default function ImageBox({
   classesWrapper = '',
   fit = 'cover',
   mode = 'fillBox',
+  backgroundClassName = 'bg-gray-50',
   ...props
 }: ImageBoxProps) {
   if (!image?.asset) return null
@@ -52,7 +54,7 @@ export default function ImageBox({
   // FillBox mode: fixed box (aspect-* or h-*) + object-fit controls cropping
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-[3px] bg-gray-50 ${classesWrapper}`}
+      className={`relative w-full overflow-hidden rounded-[3px] ${backgroundClassName} ${classesWrapper}`}
       data-sanity={props['data-sanity']}
     >
       <Image
