@@ -28,6 +28,8 @@ export const pagesBySlugQuery = defineQuery(`
     body,
     overview,
     title,
+    heroImage,
+    portraitImage,
     "slug": slug.current,
   }
 `)

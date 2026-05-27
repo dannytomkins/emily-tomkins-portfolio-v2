@@ -1,5 +1,6 @@
 import {CustomPortableText} from '@/components/CustomPortableText'
 import {Header} from '@/components/Header'
+import ImageBox from '@/components/ImageBox'
 import {sanityFetch} from '@/sanity/lib/live'
 import {pagesBySlugQuery, slugsByTypeQuery} from '@/sanity/lib/queries'
 import type {Metadata, ResolvingMetadata} from 'next'
@@ -59,6 +60,19 @@ export default async function PageSlugRoute({params}: Props) {
           description={overview}
         />
 
+        {/* Images */}
+
+        {data?.heroImage && (
+          <div className="my-8">
+            <ImageBox image={data.heroImage} alt="" fit="contain" mode="natural" />
+          </div>
+        )}
+
+        {data?.portraitImage && (
+          <div className="my-8 max-w-md">
+            <ImageBox image={data.portraitImage} alt="" fit="contain" mode="natural" />
+          </div>
+        )}
         {/* Body */}
         {body && (
           <CustomPortableText
