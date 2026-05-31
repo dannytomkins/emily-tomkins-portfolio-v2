@@ -114,19 +114,17 @@ export function WorkGallery({works}: {works: Work[]}) {
                     type="button"
                     onClick={next}
                     className="block h-full w-full cursor-default"
-                    aria-label={
-                      activeImages.length > 1 ? 'Advance to next image' : 'Image preview'
-                    }
+                    aria-label={activeImages.length > 1 ? 'Advance to next image' : 'Image preview'}
                   >
-<ImageBox
-  image={activeImages[openImageIndex]}
-  alt={activeWork.title ?? ''}
-  fit="contain"
-  mode="fillBox"
-  backgroundClassName="bg-black"
-  classesWrapper="h-full w-full"
-  size="(max-width: 1024px) 100vw, 1024px"
-/>
+                    <ImageBox
+                      image={activeImages[openImageIndex]}
+                      alt={activeWork.title ?? ''}
+                      fit="contain"
+                      mode="fillBox"
+                      backgroundClassName="bg-black"
+                      classesWrapper="h-full w-full"
+                      size="(max-width: 1024px) 100vw, 1024px"
+                    />
                   </button>
                 </div>
               </div>
@@ -178,27 +176,13 @@ export function WorkGallery({works}: {works: Work[]}) {
                 </div>
               ) : null}
 
-              <div className="mt-3 flex min-h-[3.5rem] items-center justify-between gap-3 text-white">
-                <div className="min-w-0">
-                  <div className="truncate text-base font-medium">
-                    {activeWork.title ?? 'Untitled'}
+              {activeImages.length > 1 ? (
+                <div className="mt-3 flex justify-end text-white">
+                  <div className="text-sm text-white/80">
+                    {openImageIndex + 1}/{activeImages.length}
                   </div>
-
-                  {activeWork.overview ? (
-                    <div className="mt-1 line-clamp-2 text-sm text-white/80">
-                      {activeWork.overview}
-                    </div>
-                  ) : null}
                 </div>
-
-                {activeImages.length > 1 ? (
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm text-white/80">
-                      {openImageIndex + 1}/{activeImages.length}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+              ) : null}
 
               <div className="mt-2 text-xs text-white/60">
                 {activeImages.length > 1
@@ -211,30 +195,30 @@ export function WorkGallery({works}: {works: Work[]}) {
         )
       : null
 
-return (
-  <>
-    <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
-      {works?.map((work, idx) => (
-        <button
-          key={work._id}
-          type="button"
-          onClick={() => open(idx, 0)}
-          aria-label={`Open ${work.title ?? 'work'} gallery`}
-          className="group mb-6 block w-full break-inside-avoid cursor-pointer bg-transparent text-left transition hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-black/20"
-        >
-          <div className="transition group-hover:scale-[1.01]">
-            <ImageBox
-              image={work.coverImage}
-              alt={work.title ?? ''}
-              fit="contain"
-              mode="natural"
-            />
-          </div>
-        </button>
-      ))}
-    </div>
+  return (
+    <>
+      <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
+        {works?.map((work, idx) => (
+          <button
+            key={work._id}
+            type="button"
+            onClick={() => open(idx, 0)}
+            aria-label={`Open ${work.title ?? 'work'} gallery`}
+            className="group mb-6 block w-full break-inside-avoid cursor-pointer bg-transparent text-left transition hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-black/20"
+          >
+            <div className="transition group-hover:scale-[1.01]">
+              <ImageBox
+                image={work.coverImage}
+                alt={work.title ?? ''}
+                fit="contain"
+                mode="natural"
+              />
+            </div>
+          </button>
+        ))}
+      </div>
 
-    {lightbox}
-  </>
-)
+      {lightbox}
+    </>
+  )
 }
