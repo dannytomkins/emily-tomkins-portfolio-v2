@@ -38,8 +38,14 @@ export function HomePage({data}: HomePageProps) {
         />
       )}
       {heroImage && (
-        <div className="my-8">
-          <ImageBox image={heroImage} alt="" fit="contain" mode="natural" />
+        <div className="my-12">
+          <ImageBox
+            image={heroImage}
+            alt=""
+            fit="contain"
+            mode="fillBox"
+            classesWrapper="h-[70vh] w-full bg-transparent"
+          />
         </div>
       )}
 
