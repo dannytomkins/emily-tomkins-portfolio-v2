@@ -1,4 +1,5 @@
 import {Header} from '@/components/Header'
+import ImageBox from '@/components/ImageBox'
 import {OptimisticSortOrder} from '@/components/OptimisticSortOrder'
 import {ProjectListItem} from '@/components/ProjectListItem'
 import type {HomePageQueryResult} from '@/sanity.types'
@@ -12,9 +13,8 @@ export interface HomePageProps {
 }
 
 export function HomePage({data}: HomePageProps) {
-    // Default to an empty object to allow previews on non-existent documents
-  const {overview = [], showcaseProjects = [], title = ''} = data ?? {}
-
+  // Default to an empty object to allow previews on non-existent documents
+  const {overview = [], showcaseProjects = [], title = '', heroImage, portraitImage} = data ?? {}
   const dataAttribute =
     data?._id && data?._type
       ? createDataAttribute({
@@ -37,27 +37,38 @@ export function HomePage({data}: HomePageProps) {
           description={overview}
         />
       )}
+      {heroImage && (
+        <div className="my-8">
+          <ImageBox image={heroImage} alt="" fit="contain" mode="natural" />
+        </div>
+      )}
+
+      {portraitImage && (
+        <div className="my-8 max-w-md">
+          <ImageBox image={portraitImage} alt="" fit="contain" mode="natural" />
+        </div>
+      )}
       {/* Showcase projects */}
-<div className="mx-auto max-w-[100rem] rounded-md border">
-  {showcaseProjects &&
-    showcaseProjects.length > 0 &&
-    showcaseProjects.map((project) => {
-      const href = resolveHref(project?._type, project?.slug)
-      if (!href) {
-        return null
-      }
-      return (
-        <Link
-          className="flex flex-col gap-x-5 p-2 transition odd:border-b odd:border-t hover:bg-gray-50/50 xl:flex-row odd:xl:flex-row-reverse"
-          key={project._key}
-          href={href}
-          data-sanity={dataAttribute?.(['showcaseProjects', {_key: project._key}])}
-        >
-          <ProjectListItem project={project as any} />
-        </Link>
-      )
-    })}
-</div>
+      <div className="mx-auto max-w-[100rem] rounded-md border">
+        {showcaseProjects &&
+          showcaseProjects.length > 0 &&
+          showcaseProjects.map((project) => {
+            const href = resolveHref(project?._type, project?.slug)
+            if (!href) {
+              return null
+            }
+            return (
+              <Link
+                className="flex flex-col gap-x-5 p-2 transition odd:border-b odd:border-t hover:bg-gray-50/50 xl:flex-row odd:xl:flex-row-reverse"
+                key={project._key}
+                href={href}
+                data-sanity={dataAttribute?.(['showcaseProjects', {_key: project._key}])}
+              >
+                <ProjectListItem project={project as any} />
+              </Link>
+            )
+          })}
+      </div>
     </div>
   )
 }

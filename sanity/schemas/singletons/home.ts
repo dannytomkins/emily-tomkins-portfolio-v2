@@ -59,6 +59,23 @@ export default defineType({
       validation: (rule) => rule.max(155).required(),
     }),
     defineField({
+      name: 'heroImage',
+      title: 'Hero Image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    }),
+
+    defineField({
+      name: 'portraitImage',
+      title: 'Portrait Image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
       name: 'showcaseProjects',
       title: 'Showcase projects',
       description: 'These are the projects that will appear first on your landing page.',

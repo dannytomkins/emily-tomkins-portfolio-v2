@@ -5,6 +5,8 @@ export const homePageQuery = defineQuery(`
     _id,
     _type,
     overview,
+    heroImage,
+    portraitImage,
     showcaseProjects[]{
       _key,
       ...@->{
